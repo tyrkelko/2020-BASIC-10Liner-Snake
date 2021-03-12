@@ -1,0 +1,124 @@
+       10LINER SNAKE
+
+(c) 2020 by Kobi Tyrkel
+
+This is a 10-liner snake game.
+
+Game written for NOMAM's BASIC 10-liners Contest 2020
+
+Should qualify for PUR-80 using abbreviations as below will not exceed 80 characters per logical line.
+
+Developed for ATARI 800XL (Other atari 8bit should work, tested on real atari 800XL and on ALTIRRA emulator v3.1 RAM basic):
+
+Requires:
+- Atari XL/XE (or emulator)
+- Atari BASIC cartridge/ROM (Internal BASIC - boot without OPTION key)
+- Joystick
+
+Load instructions:
+- Boot SNAKE.ATR disk
+- File AUTORUN.BAS will automatically load and run the game. In case it doesn't, type: LOAD "D:AUTORUN.BAS" and type: RUN
+- Press fire to start a the game
+- Play the game
+- Press fire to play again
+
+Game instructions:
+Press fire on the Joystick to start the game.
+You are Moses the snake. A small size snake.
+Your goal is to eat asterix signs ('*') while avoiding hitting obstacles and your self.
+Every time you eat an asterix you grow by one '#' sign and you drop an 'O' obstacle on the screen.
+Use joystick 1 to move in any of the 4 directions left, right, up and down.
+You must avoid hitting any obstacle, that includes walls, writings, your self or the 'O' letters that you drop each time you eat and asterix.
+Once you exceed lenght of 20 you win the game.
+Win or lose, you can start over by clicking "Fire" on the joystick.
+
+Code:
+
+0DI.X(21),Y(21),S$(50):S$="YOU LOSEYOU WIN!10LINER-SNAKEPRESS FIRE":S=0:X=9:Y=9
+1GR.17:C.7:PL.0,0:DR.19,0:DR.19,23:DR.0,23:DR.0,0:S=S+1:POS.3,0:?#6;S$(17,29)
+2I=INT(RND(1)*18)+1:J=INT(RND(1)*22)+1:L=L+1:X(L)=X(L-1):Y(L)=Y(L-1):W=0
+3E=(X=I AND Y=J):C.79:PL.X,Y:C.10:PL.I,J:C.3:PL.X(1),Y(1):C.32:PL.X(L),Y(L)
+4T=STICK(0):M=(D<>13ANDT=14)OR(D<>14ANDT=13)OR(D<>11ANDT=7)OR(D<>7ANDT=11)
+5D=T*M+D*(1-M):Y=Y+(D=13)-(D=14):X=X+(D=7)-(D=11):G=6-4*E+2*W+2*(S=1):G.G
+6LOC.X,Y,C:FORA=L TO1STEP-1:X(A)=X(A-1):Y(A)=Y(A-1):N.A:C.79:PL.X,Y
+7X(0)=X:Y(0)=Y:H=(C<>10 AND C<>32):W=(L>20):IFH=0THEN3
+8POS.6,9:?#6;S$(1+8*(W)+3*(S=1),8+8*(W)-4*(S=1)):POS.5,11:?#6;S$(30):Y=11
+9X=9:L=2:FORA=0TO4:X(A)=X:Y(A)=Y:N.A:D=11-(RND(0)>0.5)*4:G=1+7*STRIG(0):G.G
+
+Code explanation:
+
+0DI.X(21),Y(21),S$(50):S$="YOU LOSEYOU WIN!10LINER-SNAKEPRESS FIRE":S=0:X=9:Y=9
+- Game initialization, used only on launch to define arrays, strings, and iteration variable.
+- X and Y array of each of the snake spine position.
+- S$ is a string that holds all strings used in this game.
+- S is the game itteration and is later used in line #8 for considering if a game was already played or if we shouldn't display a "win" or "lose" message.
+- X,Y variables hold the snake head position
+
+1GR.17:C.7:PL.0,0:DR.19,0:DR.19,23:DR.0,23:DR.0,0:S=S+1:POS.3,0:?#6;S$(17,29)
+- Set clean graphic mode 17, draw borders and title.
+- GR.17	- GR. is an abbreviation of GRAPHICS. Open graphics mode 17 (20x24 color text mode with no bottom console). It also clears the screen.
+- C.7	- C. is an abbreviation of COLOR which sets the graphics color. In this graphics mode it sets the character and color to use. 7 is a tag character ("'").
+- PL.0,0:DR.19,0:DR.19,23:DR.0,23:DR.0,0	- PL. is an abbreviation for PLOT and DR. is an abbreviation for DRAWTO. These commands draws the border of the screen.
+- S=S+1	- Increments the iteration every time we start the game. So, 1 becomes the first itteration and any higher number is not the first itteration.
+- POS.3,0:?#6;S$(17,30)	- This adds the game title '10-LINER-SNAKE' at the top border of the screen. 
+- POS. is an abbreviation of the command POSITION which sets the cursor position for printing at the desired position. 
+- ? 	- ? is an abbreviation for the PRINT command.
+- #6	- Device #6 is automatically set to be the graphics window of the television screen when we are in modes other than 0. By using the command PRINT #6; (the # and ; are essential), we cause the ATASCII code to be sent to the graphics window in modes 1 through 8. semi-colon (';') keeps the position set so any text appended after the semi-colon.
+- S$(17,29) returns the part of the string which says "10-LINER-SNAKE".2I=INT(RND(1)*18)+1:J=INT(RND(1)*22)+1:L=L+1:X(L)=X(L-1):Y(L)=Y(L-1)
+
+2I=INT(RND(1)*18)+1:J=INT(RND(1)*22)+1:L=L+1:X(L)=X(L-1):Y(L)=Y(L-1)
+- Spawn an asterix randomly on the screen, and increase the snake size by 1.
+- I is the index for asterix x position.
+- J is the index for asterix y position.
+- INT floors floating number to integer.
+- RND(1) returns a random floating number between 0 and 1. We multiply by the screen size minus the borders and increase by 1 so that it is between the screen borders.
+- L is the snake length and is increased by 1.
+- X(L)=X(L-1):Y(L)=Y(L-1) - The new snake spine part gets its position from the previous snake last part.
+ 
+3E=(X=I AND Y=J):C.79:PL.X,Y:C.10:PL.I,J:C.3:PL.X(1),Y(1):C.32:PL.X(L),Y(L):W=0
+- Check if snake head colides with an asterix (hence eat an asterix). Draw the snake head, the asterix, the snake part next to the head and cut the tail by one.
+- E=(X=I AND Y=J) - E holds the boolean value of the result asking if snake X,Y position equals ASTERIX I,J position. This is later used to determine if to jump to line #2 to spawn a new asterix and increase the snake size.
+- C.79:PL.X,Y 	- This draws the character 'O' with red color as the head of the snake in the new snake head position.
+- C.10:PL.I,J	- This draws the asterix in its position I,J
+- C.3:PL.X(1),Y(1) - This replaces the head previous position with a '#' sign as part of the snake body.
+- C.32:PL.X(L),Y(L) - This deletes the snake last part when moving.
+- W 		- WIN flag reset.
+4T=STICK(0):M=(D<>13ANDT=14)OR(D<>14ANDT=13)OR(D<>11ANDT=7)OR(D<>7ANDT=11)
+- Check joystick in port 1 for direction and set M with boolean value telling if we should change the direction
+- T=STICK(0)	- T is set to the value returned from joystick in port 1.
+- M=(D<>13ANDT=14)OR(D<>14ANDT=13)OR(D<>11ANDT=7)OR(D<>7ANDT=11) - M is set to boolean result when checking for allowed directions which are up-14, down-13, left-11, right-7 and not allowing to change direction to opposite of current direction so the snake can't go back into itself. E.g., if current direction is up don't allow switch direction to down.
+
+5D=T*M+D*(1-M):Y=Y+(D=13)-(D=14):X=X+(D=7)-(D=11):G=6-4*E+2*W+2*(S=1):G.G
+- Update direction D, update snake head position according to direction, if snake eaten an asteric (E=True) jump to line 2, if s=1, it is a new game, jump to menu on line 8 otherwise jump to next line.
+- D=T*M+D*(1-M) - D holds the snake joystick direction. it is either remain D if M is 0 or changes to T which holds the joystick direction to change to from line #4.
+- Y=Y+(D=13)-(D=14) - update Y position up if D=14 (top of screen is 0) and down if D=13 (bottom of screen is 23)
+- X=X+(D=7)-(D=11)  - update X position left if D=11 and right if D=7.
+- G=6-4*E+2*W+2*(S=1):G.G - Set line number to goto and jump to this line. G defaults to 6, the next line. we reduce by 4 to jump to line #2 if E is true and we've eaten an asterix. we increase by 2 and jump to game over menu if snake size is more than 20 or if this is first iteration and S=1.
+- G. is an abbreviation of GOTO and it goes to line number stored in variable G.
+
+6LOC.X,Y,C:FORA=L TO1STEP-1:X(A)=X(A-1):Y(A)=Y(A-1):N.A:C.79:PL.X,Y
+- Check what is in the screen position where the snake head new position is. Update snake spine positions. Draw head in new position.
+- LOC.X,Y,C - LOC. is an abbreviation for LOCATE. It stores in variable C the character found on screen position X,Y. We later use C to decide if there was a collision and we should end the game or not in line #7.
+- FORA=L TO1STEP-1:X(A)=X(A-1):Y(A)=Y(A-1):N.A - This for next loops from the last part of the snake to the head and updates the snake spine positions into the snake X,Y array. It leaves the new head position out so it will drop an 'O' character on the screen as an obstacle for the snake to avoid.
+- C.79:PL.X,Y - COLOR 79 is red 'O' which draws snake head in its new position.
+
+7X(0)=X:Y(0)=Y:H=(C<>10 AND C<>32):W=(L>20):IFH=0THEN3
+- Update snake position array with new head position. Check if snake hhead collision occured and if not loop back to line #3. Otherwise continue to game over menu in 
+- X(0)=X:Y(0)=Y - Update snake position array with new head position.
+- H=(C<>10 AND C<>32) - set H boolean value 1 if the snake head new position colided with something that isn't 10 (asterix) or 32 (blank space).
+- W=(L>20)	- set W boolean true if goal of snake length > 20 achieved. This is used in line 5 to decide if to end game and go to menu.
+- IFH=0THEN3	- IF H=0 (no collision was made with anything other than blank space or asterix) then loop back to line #3 and continue game loop.
+
+8POS.6,9:?#6;S$(1+8*(W)+3*(S=1),8+8*(W)-4*(S=1)):POS.5,11:?#6;S$(30):Y=11
+9X=9:L=2:FORA=0TO4:X(A)=X:Y(A)=Y:N.A:D=11-(RND(0)>0.5)*4:G=1+7*STRIG(0):G.G
+
+- Display game menu. Tell user to click fire for a new game. Indicate if there was a previous game and if player won or lost and reset game variables for new game.
+- POS.6,9:?#6;S$(1+8*(W)+3*(S=1),8+8*(W)-4*(S=1)) - if W boolean is true - display win message, if W false display lose message if S=1 don't display message since there was no game played (first run).
+- POS.5,11:?#6;S$(30) - display "PRESS FIRE" message.
+- Y=11, X=9 - set snake head position to middle of the screen for a new game
+- L=2 - set snake length to 2
+- FORA=0TO4:X(A)=X:Y(A)=Y:N.A - loop and set position of 4 snake spine parts to the new head position so it all starts from the same position.
+- D=11-(RND(0)>0.5)*4 - randomly set direction to left or right (11 or 7)
+- Set line to jump to either 1 or 8 - depending on the fire button of joystick in port 1. If not clicked we get 1+7 otherwise we get 1.
+- G.G - GOTO line stored in G (1 for a new game if user clicked fire and 8 to continue itterate on menu if not).
+
